@@ -35,7 +35,7 @@ This means:
 1. Deck1 load Song1
    * now playing: Song1
 2. Deck2 load Song2
-   * now playgin: Song1
+   * now playing: Song1
 3. Deck1 load Song3 
    * now playing: Song2
 
