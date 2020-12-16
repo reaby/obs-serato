@@ -37,7 +37,7 @@ This means:
 2. Deck2 load Song2
    * now playgin: Song1
 3. Deck1 load Song3 
-   * now playgin: Song2
+   * now playing: Song2
 
 So it goes in delay.
 
@@ -48,8 +48,8 @@ press eject of non-loaded song:
    * now playing: Song1
 2. Deck2 load Song2
    * Press eject on deck1
-   * now playgin: Song2
+   * now playing: Song2
 3. Deck1 load Song3 
    * Press eject on deck2
-   * now playgin: Song3
+   * now playing: Song3
 
