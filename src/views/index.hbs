@@ -15,7 +15,7 @@
     .helper {
       text-align: left;
       font-family: "Roboto", sans-serif;
-      font-weight: 900;
+      font-weight: 400;
       color: var(--text-color);
       text-shadow: 0 0 4px var(--neon-text-color),
         0 0 32px var(--neon-text-color), 0 0 96px var(--neon-text-color);
@@ -46,7 +46,6 @@
   var aOut = "{{config.animation.out}}";
 
   $(() => {
-    console.log("rok");
     fetchUpdates();
     setInterval(fetchUpdates, 5000);
   });

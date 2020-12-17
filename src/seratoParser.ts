@@ -46,7 +46,7 @@ class SeratoParser {
       const start = byt.indexOf("\u0000\u0000\u0006");
       let end = -1;
       if (start > 0) {
-        end = byt.indexOf("\u0000\u0007");
+        end = byt.indexOf("\u0000\u0000\u0000\u0007");
         if (end == -1) {
           end = byt.indexOf("\u0000\u0000\u0000\u0008");
         }
@@ -84,14 +84,15 @@ class SeratoParser {
           byte: statusByte,
         };
         songs.push(songData);
-
+        //console.log(songData);
+        
         const id: string = song + artist;
-      //  console.log(id + ": " + statusByte);             
+       //console.log(id + ": " + status);             
         if (status == true) {
           if (!cache.hasOwnProperty(id)) {
             cache[id] = [songData];
           } else {
-            cache[id].push(songData);
+            // cache[id].push(songData);   // commenthing this fixes odd bug, when 2 songs are loaded, but history shows only one song out 
           }
         } else {
           try {
@@ -111,7 +112,7 @@ class SeratoParser {
     for (const song in cache) {
       out.push(cache[song][0]);
     }
-
+    // console.log(out);
     if (out.length > 0) {
       return { song: out[0].song, artist: out[0].artist };
     } else {
