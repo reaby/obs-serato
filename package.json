@@ -65,13 +65,14 @@
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
     "glob": "^7.1.6",
+    "hbs": "4.1.1",
     "helmet": "^4.2.0",
     "http-status-codes": "^2.1.4",
     "jet-logger": "^1.0.4",
     "jsonfile": "^6.1.0",
     "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
-    "hbs": "4.1.1"
+    "seratohistory": "git://github.com/nhcarter123/seratohistory.git"
   },
   "devDependencies": {
     "@types/command-line-args": "^5.0.0",

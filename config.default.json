@@ -1,0 +1,12 @@
+{
+    "textColors": {
+        "fill": "white",
+        "border": "transparent",
+        "halo": "magenta",
+        "highlite": "#d00"
+    },
+    "animation": {
+        "in": "animate__fadeIn",
+        "out": "animate__fadeOut"
+    }
+}

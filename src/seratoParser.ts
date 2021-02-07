@@ -1,14 +1,18 @@
-import { Buffer } from "buffer";
-import * as fs from "fs";
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import * as glob from "glob";
 import { homedir } from "os";
+import * as fs from "fs";
+const BufferHelper = require("seratohistory/lib/bufferHelper.js");
+const { HISTORY_FIELDS } = require("seratohistory/lib/definitions.js");
+const pick = (obj: any, arr: any) =>
+  arr.reduce(
+    (acc: any, curr: any) => (curr in obj && (acc[curr] = obj[curr]), acc),
+    {}
+  );
 
-interface songData {
-  status: boolean;
-  song: string;
-  artist: string;
-  byte: number;
-}
+// const diff = (a: any, b: any) => a.filter((v: any) => !b.includes(v));
 
 class SeratoParser {
   public home = "";
@@ -28,106 +32,52 @@ class SeratoParser {
     }
   }
 
-  getCurrent(file: string) {
-    const data = fs.readFileSync(file).toString();
-    const tracks = data.split("oent");
-    const songs: songData[] = [];
+  async getCurrent(file: string): Promise<any> {
+    const buffer = await fs.promises.readFile(file);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const chunks: any = await BufferHelper.parseChunkArray(
+      buffer,
+      0,
+      buffer.length
+    );
     const cache: any = {};
 
-    for (const byt of tracks) {
-      let status = true;
-      if (
-        byt.indexOf("\u0000\u0000\u0000-") > 0 ||
-        byt.indexOf("\u0000\u0000\u0000\u0003") > 0
-      ) {
-        status = false;
-      }
-
-      const start = byt.indexOf("\u0000\u0000\u0006");
-      let end = -1;
-      if (start > 0) {
-        end = byt.indexOf("\u0000\u0000\u0000\u0007");
-        if (end == -1) {
-          end = byt.indexOf("\u0000\u0000\u0000\u0008");
+    for (const i in chunks) {
+      const chunk: any = chunks[i];
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      if (chunk instanceof Object) {
+        if (chunk["\x00\x00\x00F"] === "\x01") {
+          delete cache[chunk.filePath];
+          continue;
         }
-        if (end == -1) {
-          end = byt.indexOf("\u0000\u0000\u0000\t");
-        }
-        if (end == -1) {
-          end = byt.indexOf("\u0000\u0000\u0000\u000f");
-        }
-      }
-
-      const aStart = byt.indexOf("\u0000\u0000\u0000\u0007");
-      let aEnd = -1;
-      if (aStart > 0) {
-        aEnd = byt.indexOf("\u0000\u0000\u0000\u0000\u0008");
-        if (aEnd == -1) aEnd = byt.indexOf("\u0000\u0000\u0000\u0000\t");
-        if (aEnd == -1) aEnd = byt.indexOf("\u0000\u0000\u0000\u0000\u000f");
-      }
-
-      let song = "-";
-      if (start > 0) {
-        song = byt.substr(start + 8, end - start - 8).replace(/\u0000/g, "");
-        let artist = "-";
-        if (aStart > 0) {
-          artist = byt
-            .substr(aStart + 8, aEnd - aStart - 8)
-            .replace(/\u0000/g, "");
-        }
-
-        const statusByte = Buffer.from(byt.substr(3, 1)).readUInt8(0);
-        const songData = {
-          status: status,
-          song: song,
-          artist: artist,
-          byte: statusByte,
-        };
-        songs.push(songData);
-        //console.log(songData);
-        
-        const id: string = song + artist;
-       //console.log(id + ": " + status);             
-        if (status == true) {
-          if (!cache.hasOwnProperty(id)) {
-            cache[id] = [songData];
-          } else {
-            // cache[id].push(songData);   // commenthing this fixes odd bug, when 2 songs are loaded, but history shows only one song out 
-          }
+        if (Object.keys(cache).includes(chunk.filePath)) {
+          delete cache[chunk.filePath];
         } else {
-          try {
-            cache[id].pop();
-            if (cache[id].length == 0) {
-              delete cache[id];
-            }
-          } catch (e) {
-            // silent error
-            // console.log(e);
-          }
+           cache[chunk.filePath] = pick(chunk, HISTORY_FIELDS);          
+          //cache[chunk.filePath] = chunk;
         }
       }
     }
-    
+
     const out = [];
-    for (const song in cache) {
-      out.push(cache[song][0]);
+    for (const o in cache) {
+      out.push(cache[o]);
     }
-    // console.log(out);
-    if (out.length > 0) {
-      return { song: out[0].song, artist: out[0].artist };
+
+    if (out.length >= 1) {
+      return out[0];
     } else {
-      return { song: "", artist: "" };
+      return { title: "-", artist: "-" };
     }
   }
 
-  parse() {
+  async parse(): Promise<any> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const newestFile: string = glob
       .sync(this.home + "/*.session")
       .map((name: any) => ({ name, ctime: fs.statSync(name).ctime }))
       .sort((a: any, b: any) => b.ctime - a.ctime)[0].name;
-
-    return this.getCurrent(newestFile);
+    return await this.getCurrent(newestFile);
   }
 }
 

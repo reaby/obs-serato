@@ -34,9 +34,9 @@
 
 <body>
   <div class="helper">
-    <div id="container" class="animated">
+    <div id="container" class="animate__animated">
       <div id="song" class=""></div>
-      <div id="artist" class=""></div>
+      <div id="artist" class=""></div>     
     </div>
   </div>
   <script src="scripts/jquery.min.js"></script>
@@ -53,13 +53,13 @@
   function fetchUpdates() {
     $("#container").removeClass("hidden");
     $.getJSON("/api/current", (data) => {
-      title = data.artist + " - " + data.song;
+      title = data.artist + " - " + data.title;
       if (currentSong != title) {
         currentSong = title;
         $("#container").removeClass(aIn).addClass(aOut);
         setTimeout(() => {
           $("#container").removeClass(aOut).addClass(aIn);
-          $("#song").text(data.song);
+          $("#song").text(data.title);
           $("#artist").text(data.artist);
         }, 1500);
       }

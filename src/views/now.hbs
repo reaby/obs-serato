@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Serato Playing Now</title>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/animate.css" />
+  <style>
+    :root {      
+      --text-color: {{ config.textColors.fill }};
+      --highlite:  {{ config.textColors.highlite }};
+    }
+
+    html,
+    body {
+      background: none;
+      overflow: hidden;
+    }
+
+    body {
+      padding: 1rem;
+      margin: 0;
+      height: 100%;
+    }
+
+    html {
+      min-height: 100%;
+    }
+
+    .helper {
+      font-family: "Roboto", sans-serif;
+      font-weight: 700;
+    }
+
+    #now {
+      background: var(--highlite);
+      color: white;
+      width: min-content;
+      padding: 0.25rem 1rem;
+      font-weight: 500;
+      font-size: 14pt;
+      margin-bottom: 1rem;
+      margin-left: 0.5rem;
+    }
+
+    #outerContainer {
+      position: absolute;
+      display: block;
+      border-left: 3px solid var(--highlite);
+      padding: 1rem 0;
+      height: 5.5rem;
+    }
+
+    #container {      
+      font-weight: 600;
+      position: absolute;
+      display: block;
+      width: 90rem;
+      height: 3rem;
+      padding-left: 0.5rem;
+      line-height: 1.2;
+      font-size: 18pt;
+      color: var(--text-color);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="helper">
+    <div id="now">Now&nbsp;Playing</div>
+    <div id="outerContainer">
+      <div style="  position: absolute; display: block; clip: rect(0px, 1280px, 200px, 0px);">
+        <div id="container" class="animate__animated animate__slideInLeft">
+          <div id="song" class="">&nbsp;</div>
+          <div id="artist" class="">&nbsp;</div>
+          <div id="details" class="">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="scripts/jquery.min.js"></script>
+  <script>
+    var currentSong = "";
+    var aIn = "animate__slideInLeft";
+    var aOut = "animate__slideOutLeft";
+
+    $(() => {
+      fetchUpdates();
+      setInterval(fetchUpdates, 5000);
+    });
+
+    function fetchUpdates() {
+      $.getJSON("/api/current", (data) => {
+        title = data.filePath;
+        if (currentSong != title) {
+          currentSong = title;
+          $("#container").removeClass(aIn).addClass(aOut);
+          setTimeout(() => {
+            $("#container").removeClass(aOut).addClass(aIn);
+            $("#song").text(data.title);
+            $("#artist").text(data.artist);
+            let out = "";
+            if ("label" in data) {
+            out += data.label;
+            }            
+            if ("year" in data) {
+            out += " [" + data.year+"]";
+            }
+            $("#details").text(out);            
+          }, 1500);
+        }
+      });
+    }
+  </script>
+</body>
+
+
+
+
+</html>

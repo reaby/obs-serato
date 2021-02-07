@@ -6,12 +6,12 @@ Now playing infos from serato.
 
 1. Install nodejs
 2. Extract zip or clone repository to somewhere at same computer where your serato is
-3. run  `npm install` at repository directory
-4. after successfull install type: `npm run start:dev`
-5. edit `config.json` to match your favourite colors
+3. copy `config.default.json` to `config.json` and edit it match your favourite colors
+4. run  `npm install` at repository directory
+5. after successfull install type: `npm run start:dev`
 6. setup OBS
    1. add new browser source
-   2. set URL: http://localhost:8000
+   2. set URL: http://localhost:8000 or http://localhost:8000/now
       * if you run obs different machine, use the serato machine ip instead of localhost
    3. set width 1920
    4. set height 400
